@@ -1,3 +1,0 @@
-OPEN_ROUTER_TOKEN = 'xxx'
-OPEN_ROUTER_URL = "https://openrouter.ai/api/v1"
-AUTOCOMPLETE_API_KEY = 'a4b4b1fc67d011f0b72002931d9b01fb'

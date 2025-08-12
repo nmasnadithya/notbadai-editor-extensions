@@ -21,17 +21,16 @@ def call_llm(api: 'ExtensionAPI', model_id: str, messages: List[Dict[str, str]],
     """Streams responses from the LLM and sends them to the chat UI in real-time."""
 
     model_info = MODELS[model_id]
+    model_name = model_info[api.api_provider]
     provider = None
-    model_name = None
     for p in LLM_PROVIDERS:
-        if p['name'] in model_info:
-            model_name = model_info[p['name']]
+        if p['name'] == api.api_provider:
             provider = p
             break
 
     start_time = time.time()
 
-    client = OpenAI(api_key=provider['api_key'], base_url=provider['base_url'])
+    client = OpenAI(api_key=api.api_key, base_url=provider['base_url'])
     # client = OpenAI(api_key=api.api_key, base_url="https://api.deepinfra.com/v1/openai")
 
     stream = client.chat.completions.create(
