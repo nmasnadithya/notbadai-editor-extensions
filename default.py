@@ -101,7 +101,7 @@ def extension(api: ExtensionAPI):
                                f' selection: {bool(api.selection)}')
         api.log(context)
         messages = [
-            {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
+            # {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
             {'role': 'user', 'content': context},
             *[m.to_dict() for m in api.chat_history],
             {'role': 'user', 'content': prompt},
