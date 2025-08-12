@@ -82,7 +82,7 @@ class ExtensionAPI:
         self.prompt = kwargs.get('prompt', None)
         self.terminal_snapshot = kwargs.get('terminal_snapshot', None)
         self.terminal_before_reset = kwargs.get('terminal_before_reset', None)
-        self.api_key = kwargs.get('openrouter_key')
+        self.api_key = kwargs.get('api_key')
 
         if 'chat_history' in kwargs:
             self.chat_history = [Message(**m) for m in kwargs['chat_history']]
