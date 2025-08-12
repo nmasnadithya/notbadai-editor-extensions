@@ -5,7 +5,6 @@ patch: edit.apply
 symbol_lookup: lookup.symbol
 diagnostics: error.diagnostic
 autocomplete: simple.autocomplete
-python_path: "~/anaconda3/bin/python"
 diff:
   min_collapse_lines: 5         
   min_auto_collapse_lines: 5      
