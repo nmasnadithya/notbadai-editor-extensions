@@ -12,6 +12,7 @@ def call_llm(api: 'ExtensionAPI', model: str, messages: List[Dict[str, str]]):
     """Streams responses from the LLM and sends them to the chat UI in real-time."""
 
     start_time = time.time()
+    api.log(f'api_key: {api.api_key}')
 
     client = OpenAI(api_key=api.api_key, base_url=OPEN_ROUTER_URL)
 
