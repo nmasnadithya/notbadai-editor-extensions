@@ -5,7 +5,7 @@ from typing import List, Dict
 from openai import OpenAI
 
 from common.api import ExtensionAPI
-from common.diff_lines import get_matches
+from common.diff import get_matches
 from common.secrets import OPEN_ROUTER_TOKEN, OPEN_ROUTER_URL
 
 META_TAG = 'metadata'

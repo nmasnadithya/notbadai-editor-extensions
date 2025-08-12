@@ -11,7 +11,7 @@ def _strip_ansi(text):
     return ansi_escape.sub('', text)
 
 
-def _clean_terminal_output(text):
+def _clean_carriage_return(text):
     """
     For terminal history
 
@@ -23,8 +23,6 @@ def _clean_terminal_output(text):
     Returns:
         str: Cleaned text with overwritten lines removed
     """
-    text = _strip_ansi(text)
-
     lines = text.split('\n')
     cleaned_lines = []
 
@@ -45,6 +43,16 @@ def _clean_terminal_output(text):
 
     return '\n'.join(cleaned_lines)
 
+def _clean_empty_lines(text):
+    lines = text.split('\n')
+
+    while lines and lines[0].strip() == '':
+        lines.pop(0)
+    while lines and lines[-1].strip() == '':
+        lines.pop()
+
+    return '\n'.join(lines)
 
 def get_terminal_snapshot(api: 'ExtensionAPI'):
-    return _strip_ansi('\n'.join(api.terminal_snapshot))
+    text = _strip_ansi('\n'.join(api.terminal_snapshot))
+    return _clean_empty_lines(text)

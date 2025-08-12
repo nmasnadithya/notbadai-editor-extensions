@@ -1,12 +1,11 @@
-from typing import List
 import typing
+from typing import List
 
 from common.api import ExtensionAPI, File
-from common.llm import call_llm
-from common.prompts import get_system_prompt
-from common.terminal import get_terminal_snapshot
-from common.utils import parse_prompt
 from common.formatting import markdown_section, markdown_code_block, add_line_comment
+from common.llm import call_llm
+from common.terminal import get_terminal_snapshot
+from common.utils import parse_prompt, get_prompt_template
 
 
 def build_context(api: 'ExtensionAPI', *,
@@ -26,17 +25,16 @@ def build_context(api: 'ExtensionAPI', *,
     if other_files:
         api.push_meta(f'Relevant files: {", ".join(f.path for f in other_files)}')
 
-        opened_files = [f'Path: `{f.path}`\n\n' + markdown_code_block(f.get_content()) for f in other_files]
-        context.append(markdown_section("Relevant files", "\n\n".join(opened_files)))
+        other_files = [f'Path: `{f.path}`\n\n' + markdown_code_block(f.get_content()) for f in other_files]
+        context.append(markdown_section("Relevant files", "\n\n".join(other_files)))
 
     if current_file:
         api.push_meta(f'Current file: {current_file.path}')
         context.append(
             markdown_section("Current File",
-                            f"Path: `{current_file.path}`\n\n" +
-                            markdown_code_block(current_file.get_content()))
+                             f"Path: `{current_file.path}`\n\n" +
+                             markdown_code_block(current_file.get_content()))
         )
-
 
     if terminal:
         if len(terminal) > 40_000:
@@ -46,14 +44,14 @@ def build_context(api: 'ExtensionAPI', *,
 
         context.append(
             markdown_section("Terminal output",
-                            f"{pre_text}\n\n" + markdown_code_block(terminal[-40000:]))
+                             f"{pre_text}\n\n" + markdown_code_block(terminal[-40000:]))
         )
 
     if selection and selection.strip():
         context.append(
             markdown_section("Selection",
-                            "This is the code snippet that I'm referring to\n\n" +
-                            markdown_code_block(selection))
+                             "This is the code snippet that I'm referring to\n\n" +
+                             markdown_code_block(selection))
         )
 
     if cursor:
@@ -67,7 +65,7 @@ def build_context(api: 'ExtensionAPI', *,
         block = prefix + [line] + suffix
 
         context.append(markdown_section("Cursor position",
-                                            markdown_code_block('\n'.join(block))))
+                                        markdown_code_block('\n'.join(block))))
 
     return "\n\n".join(context)
 
@@ -76,13 +74,16 @@ def extension(api: ExtensionAPI):
     """Main extension function that handles chat interactions with the AI assistant."""
 
     command, model, prompt = parse_prompt(api)
-    
+
     api.push_meta(f'model: {model}, command: {command}')
+    terminal_snapshot = get_terminal_snapshot(api)
+
+    api.log(terminal_snapshot)
 
     if command == '':
         api.push_block('meta', f'Without context')
         messages = [
-            {'role': 'system', 'content': get_system_prompt(model)},
+            {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
             *[m.to_dict() for m in api.chat_history],
             {'role': 'user', 'content': prompt},
         ]
@@ -92,15 +93,15 @@ def extension(api: ExtensionAPI):
                                 selection=api.selection,
                                 file_list=api.repo_files,
                                 current_file=api.current_file,
-                                terminal=get_terminal_snapshot(api),
+                                terminal=terminal_snapshot,
                                 cursor=(api.cursor_row, api.cursor_column),
                                 )
 
-        api.push_block('meta', f'With context: {len(context) :,},'
+        api.push_block('meta', f'With context: {len(context) :,} characters,'
                                f' selection: {bool(api.selection)}')
         api.log(context)
         messages = [
-            {'role': 'system', 'content': get_system_prompt(model)},
+            {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
             {'role': 'user', 'content': context},
             *[m.to_dict() for m in api.chat_history],
             {'role': 'user', 'content': prompt},
@@ -111,13 +112,14 @@ def extension(api: ExtensionAPI):
                                 selection=api.selection,
                                 file_list=api.repo_files,
                                 current_file=api.current_file,
-                                terminal=get_terminal_snapshot(api),
+                                terminal=terminal_snapshot,
                                 cursor=(api.cursor_row - 1, api.cursor_column - 1),
                                 )
-        api.push_block('meta', f'With context: {len(context) :,},'
+        api.push_block('meta', f'With context: {len(context) :,} characters,'
                                f' selection: {bool(api.selection)}')
+        # api.log(context)
         messages = [
-            {'role': 'system', 'content': get_system_prompt(model)},
+            {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
             {'role': 'user', 'content': context},
             *[m.to_dict() for m in api.chat_history],
             {'role': 'user', 'content': prompt},
@@ -125,7 +127,10 @@ def extension(api: ExtensionAPI):
     else:
         raise ValueError(f'Unknown command: {command}')
 
-    # api.log(f'messages {len(messages)}')
+    api.log(f'messages {len(messages)}')
     api.log(f'prompt {api.prompt}')
+    # api.log(context)
 
-    call_llm(api, model, messages)
+    content = call_llm(api, model, messages)
+
+    api.log(content)

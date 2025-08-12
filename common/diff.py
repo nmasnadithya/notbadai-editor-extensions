@@ -1,10 +1,7 @@
 import re
-import difflib
 from typing import Tuple, List
 
 from labml import monit
-
-d = difflib.Differ()
 
 
 def compare_line(l1, l2):
@@ -82,5 +79,5 @@ def get_matches(v1: str, v2: str) -> Tuple[List[List[int]], List[str]]:
             raise RuntimeError()
 
     matches.append([len(v1), len(v2)])
-    
+
     return matches, v2

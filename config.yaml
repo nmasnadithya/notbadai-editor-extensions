@@ -1,18 +1,18 @@
 chat:
   - default
 
-patch: edit.apply
-symbol_lookup: lookup.symbol
-diagnostics: error.diagnostic
-autocomplete: simple.autocomplete
+patch: apply
+symbol_lookup: lookup
+diagnostics: analyze
+#autocomplete: autocomplete
 diff:
-  min_collapse_lines: 5         
-  min_auto_collapse_lines: 5      
-  context_lines: 2           
+  min_collapse_lines: 3
+  min_auto_collapse_lines: 5
+  context_lines: 2
 inspect:
-  sample1:
-    shortcut: "ctrl+c"
-    extension: "inline_completion"
-  sample2:
-    shortcut: "ctrl+d"
-    extension: "sample_inspector"
+  autocomplete_big:
+    shortcut: "ctrl+m"
+    extension: "autocomplete_big"
+  modify:
+    shortcut: "ctrl+,"
+    extension: "modify_big"
