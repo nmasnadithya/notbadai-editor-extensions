@@ -3,7 +3,7 @@ import typing
 from typing import Dict, List
 
 from openai import OpenAI
-from .secrets import OPEN_ROUTER_TOKEN, OPEN_ROUTER_URL
+from .secrets import OPEN_ROUTER_URL
 
 if typing.TYPE_CHECKING:
     from .api import ExtensionAPI
@@ -13,7 +13,7 @@ def call_llm(api: 'ExtensionAPI', model: str, messages: List[Dict[str, str]]):
 
     start_time = time.time()
 
-    client = OpenAI(api_key=OPEN_ROUTER_TOKEN, base_url=OPEN_ROUTER_URL)
+    client = OpenAI(api_key=api.api_key, base_url=OPEN_ROUTER_URL)
 
     stream = client.chat.completions.create(
         model=model,

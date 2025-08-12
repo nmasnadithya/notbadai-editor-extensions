@@ -55,6 +55,7 @@ class ExtensionAPI:
             terminal_before_reset: Terminal content from before last reset/clear
             prompt: Current user prompt
             symbol: Symbol name (for symbol lookup)
+            api_key: str
     """
 
     repo_files: List[File]
@@ -70,6 +71,7 @@ class ExtensionAPI:
     terminal_before_reset: Optional[List[str]]
     prompt: Optional[str]
     symbol: Optional[str]
+    api_key: Optional[str]
 
     _blocks: List[str]
 
@@ -80,6 +82,7 @@ class ExtensionAPI:
         self.prompt = kwargs.get('prompt', None)
         self.terminal_snapshot = kwargs.get('terminal_snapshot', None)
         self.terminal_before_reset = kwargs.get('terminal_before_reset', None)
+        self.api_key = kwargs.get('openrouter_key')
 
         if 'chat_history' in kwargs:
             self.chat_history = [Message(**m) for m in kwargs['chat_history']]

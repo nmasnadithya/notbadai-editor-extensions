@@ -38,7 +38,7 @@ Provide exactly one YAML document listing all syntax-error entries.
 """.strip()
 
 def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]]):
-    client = OpenAI(api_key=OPEN_ROUTER_TOKEN, base_url=OPEN_ROUTER_URL)
+    client = OpenAI(api_key=api.api_key, base_url=OPEN_ROUTER_URL)
     
     response = client.chat.completions.create(
         model=model,
