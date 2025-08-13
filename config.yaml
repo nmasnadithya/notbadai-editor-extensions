@@ -5,10 +5,6 @@ patch: apply
 symbol_lookup: lookup
 diagnostics: analyze
 autocomplete: autocomplete
-diff:
-  min_collapse_lines: 3
-  min_auto_collapse_lines: 5
-  context_lines: 2
 inspect:
   autocomplete_big:
     shortcut: "ctrl+m"
@@ -16,3 +12,7 @@ inspect:
   modify:
     shortcut: "ctrl+,"
     extension: "modify_big"
+diff:
+  min_collapse_lines: 3
+  min_auto_collapse_lines: 5
+  context_lines: 2
