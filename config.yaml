@@ -1,6 +1,5 @@
 chat:
   - default
-
 patch: apply
 symbol_lookup: lookup
 diagnostics: analyze
