@@ -57,7 +57,7 @@ class AutocompleteExtension:
         self.other_files = api.opened_files
         self.current_file = api.current_file
 
-        if len(self.lines) < self.row:
+        if self.row < len(self.lines):
             self.line = self.lines[self.row]
             self.line_prefix = self.line[:self.column]
             self.last_word = _get_last_word(self.line_prefix)
