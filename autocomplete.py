@@ -56,15 +56,19 @@ class AutocompleteExtension:
         self.column = api.cursor_column - 1
         self.other_files = api.opened_files
         self.current_file = api.current_file
-        self.line = self.lines[self.row]
-        self.line_prefix = self.line[:self.column]
-        self.last_word = _get_last_word(self.line_prefix)
 
-        self.api.log(f'Initialize {len(self.lines)} lines,'
-                     f' cursor at row {self.row}, column {self.column}'
-                     f' current prefix: `{self.line_prefix}`'
-                     f' last word: `{self.last_word}`'
-                     f' line {self.line}')
+        if len(self.lines) < self.row:
+            self.line = self.lines[self.row]
+            self.line_prefix = self.line[:self.column]
+            self.last_word = _get_last_word(self.line_prefix)
+        else:
+            self.line, self.line_prefix, self.last_word = '', '', ''
+
+        # self.api.log(f'Initialize {len(self.lines)} lines,'
+        #              f' cursor at row {self.row}, column {self.column}'
+        #              f' current prefix: `{self.line_prefix}`'
+        #              f' last word: `{self.last_word}`'
+        #              f' line {self.line}')
 
     def build_prompt(self) -> List[Dict[str, str]]:
         """Build the prompt for the language model based on code context."""
@@ -112,7 +116,6 @@ class AutocompleteExtension:
             {"role": "user", "content": user_content}
         ]
 
-
     def get_completions(self) -> List[Dict[str, Any]]:
         """Get completions for the current cursor position."""
 
@@ -137,7 +140,7 @@ class AutocompleteExtension:
 
         time_elapsed = int((time.time() - start_time) * 1000)
 
-        self.api.log(f"suggestions: {suggestions}")
+        # self.api.log(f"suggestions: {suggestions}")
 
         completions = []
         seen = set()
@@ -160,7 +163,7 @@ class AutocompleteExtension:
 
             completions.append({'label': label, 'text': self.line_prefix + s})
 
-        self.api.log(f'{time_elapsed}: Found {completions}')
+        # self.api.log(f'{time_elapsed}: Found {completions}')
 
         return completions[:MAX_PREDICTIONS]
 
@@ -170,11 +173,11 @@ def extension(api: ExtensionAPI) -> None:
     global COUNTER
     COUNTER += 1
 
-    api.log(f'{COUNTER}: Autocomplete extension started')
+    # api.log(f'{COUNTER}: Autocomplete extension started')
 
     # Create extension instance and get completions
     autocomplete_ext = AutocompleteExtension(api)
-    api.log(f'"{autocomplete_ext.line_prefix}"')
+    # api.log(f'"{autocomplete_ext.line_prefix}"')
 
     suggestions = autocomplete_ext.get_completions()
 
