@@ -175,8 +175,7 @@ def extension(api: ExtensionAPI) -> None:
     # Create extension instance and get completions
     autocomplete_ext = AutocompleteExtension(api)
     api.log(f'"{autocomplete_ext.line_prefix}"')
-    # api.apply_autocomplete([{'label': autocomplete_ext.last_word + 'YY', 'text': autocomplete_ext.line_prefix + 'YY'}])
-    # return
+
     suggestions = autocomplete_ext.get_completions()
 
     api.apply_autocomplete(suggestions)
