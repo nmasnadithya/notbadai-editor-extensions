@@ -37,9 +37,9 @@ def extension(api: ExtensionAPI):
         {'role': 'user', 'content': prompt}
     ]
 
-    # api.log(f"prompt:\n {prompt}")
-
-    response = call_llm(api, 'v3', messages,
+    response = call_llm(api,
+                        'v3',
+                        messages,
                         push_to_chat=False,
                         max_tokens=1024,
                         temperature=0.8,
