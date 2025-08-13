@@ -54,7 +54,7 @@ def build_context(api: 'ExtensionAPI', *,
                              markdown_code_block(selection))
         )
 
-    if cursor:
+    if current_file and cursor:
         block = current_file.get_content().split('\n')
         assert len(block) > cursor[0], f'Cursor row {cursor[0]} block of length {len(block)}'
         prefix = block[cursor[0] - 3: cursor[0]]
