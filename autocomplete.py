@@ -6,6 +6,7 @@ from typing import List, Dict, Any
 from common.api import ExtensionAPI
 from common.llm import call_llm
 from common.utils import extract_code_block
+from common.file_type import get_file_type
 
 MAX_PREDICTIONS = 4
 
@@ -76,7 +77,7 @@ class AutocompleteExtension:
         suffix = '\n'.join(self.lines[self.row + 1:])
 
         user_content = ''
-        file_type = 'python'  # TODO
+        file_type = get_file_type(self.current_file.path)
 
         if self.other_files:
             user_content += "First, I'll provide context on the other files relevant to this task, "
