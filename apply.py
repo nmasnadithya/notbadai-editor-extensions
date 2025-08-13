@@ -106,12 +106,6 @@ def apply_blocks(content, blocks, api):
             j += 1
         else:
             i += 1
-        # elif dp[i][j] == dp[i + 1][j]:
-        #     i += 1
-        # elif dp[i][j] == dp[i][j + 1]:
-        #     j += 1
-        # else:
-        #     raise RuntimeError()
 
     matches.append([len(diff), len(content)])
 
