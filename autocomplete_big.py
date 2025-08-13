@@ -22,10 +22,6 @@ Your task:
 
 def make_prompt(api: ExtensionAPI, prefix, suffix, next_line):
     context = []
-    # file_list = api.repo_files
-    # if file_list:
-    #     repo_files = [f'{f.path}`' for f in file_list]
-    #     context.append(markdown_section("List of Files in project", "\n".join(repo_files)))
 
     other_files = api.opened_files
     if other_files:

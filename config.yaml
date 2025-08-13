@@ -4,7 +4,7 @@ chat:
 patch: apply
 symbol_lookup: lookup
 diagnostics: analyze
-#autocomplete: autocomplete
+autocomplete: autocomplete
 diff:
   min_collapse_lines: 3
   min_auto_collapse_lines: 5
