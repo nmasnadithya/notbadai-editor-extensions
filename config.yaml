@@ -5,7 +5,7 @@ patch: apply
 symbol_lookup: lookup
 diagnostics: analyze
 autocomplete: autocomplete
-key_bindings:
+key_binds:
   autocomplete_big:
     shortcut: "ctrl+m"
     extension: "autocomplete_big"
