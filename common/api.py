@@ -56,6 +56,7 @@ class ExtensionAPI:
             prompt: Current user prompt
             symbol: Symbol name (for symbol lookup)
             api_key: str
+            api_provider: str
     """
 
     repo_files: List[File]
@@ -159,7 +160,7 @@ class ExtensionAPI:
 
         self._dump('apply_autocomplete', suggestions=suggestions)
 
-    def apply_diff(self, patch: List[str], matches: List[List[int]]):
+    def apply_diff(self, patch: List[str], matches: List[List[int]], cursor_row: int = None, cursor_column: int = None):
         """
         Stream diff-match coordinates to the client UI.
 
@@ -167,8 +168,10 @@ class ExtensionAPI:
             patch: Lines of code in the patch to apply
             matches: list of [row_in_a, row_in_b] pairs returned by
                      extensions.extension_api.diff_lines.get_matches
+            cursor_row: Optional row position (1-based) where to place the cursor after applying the diff
+            cursor_column: Optional column position (1-based) where to place the cursor after applying the diff
         """
-        self._dump('apply_diff', patch=patch, matches=matches)
+        self._dump('apply_diff', patch=patch, matches=matches, cursor_row=cursor_row, cursor_column=cursor_column)
 
     def send_diagnostics(self, diagnostics: List[Dict[str, Union[int, str]]]):
         """Send diagnostics result to the client UI,
