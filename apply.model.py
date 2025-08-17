@@ -13,7 +13,15 @@ META_TAG = 'metadata'
 def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]], content: str):
     start_time = time.time()
 
-    client = OpenAI(api_key=api.api_key, base_url=LLM_PROVIDERS[api.api_provider])
+    provider = None
+    for p in LLM_PROVIDERS:
+        if p['name'] == api.api_provider:
+            provider = p
+            break
+
+    assert provider is not None
+
+    client = OpenAI(api_key=api.api_key, base_url=provider['base_url'])
 
     response = client.chat.completions.create(
         model=model,
