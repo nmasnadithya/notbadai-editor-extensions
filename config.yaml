@@ -2,7 +2,6 @@ chat:
   - default
 patch: apply
 symbol_lookup: lookup
-diagnostics: analyze
 autocomplete: autocomplete
 key_binds:
   autocomplete_big:
