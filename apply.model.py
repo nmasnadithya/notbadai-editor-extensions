@@ -5,6 +5,7 @@ from openai import OpenAI
 
 from common.api import ExtensionAPI
 from common.diff import get_matches
+from common.settings import LLM_PROVIDERS
 
 META_TAG = 'metadata'
 
@@ -12,7 +13,7 @@ META_TAG = 'metadata'
 def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]], content: str):
     start_time = time.time()
 
-    client = OpenAI(api_key=api.api_key, base_url=api.api_provider)
+    client = OpenAI(api_key=api.api_key, base_url=LLM_PROVIDERS[api.api_provider])
 
     response = client.chat.completions.create(
         model=model,
