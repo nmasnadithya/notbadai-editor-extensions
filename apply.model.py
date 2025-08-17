@@ -7,8 +7,6 @@ from common.api import ExtensionAPI
 from common.diff import get_matches
 from common.settings import LLM_PROVIDERS
 
-META_TAG = 'metadata'
-
 
 def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]], content: str):
     start_time = time.time()
@@ -47,8 +45,6 @@ def extension(api: ExtensionAPI):
             content = api.edit_file.get_content()
         except FileNotFoundError:
             content = ''
-    # api.log(f'patch generation started ...')
-    # api.log(f'{api.edit_file.path}/{api.current_file.path}')
 
     model = 'morph/morph-v3-fast'
     instruction = ''
