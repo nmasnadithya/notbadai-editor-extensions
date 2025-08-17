@@ -11,6 +11,12 @@ key_binds:
   modify:
     shortcut: "ctrl+,"
     extension: "modify_big"
+  analyze:
+    shortcut: "cmd+e"
+    extension: "analyze"
+  format:
+    shortcut: "cmd+l"
+    extension: "format"
 diff:
   min_collapse_lines: 3
   min_auto_collapse_lines: 5
