@@ -1,6 +1,6 @@
 chat:
   - default
-patch: apply.model
+apply: apply.model
 symbol_lookup: lookup
 autocomplete: autocomplete
 key_binds:
