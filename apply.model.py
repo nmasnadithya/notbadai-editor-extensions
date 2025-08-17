@@ -34,7 +34,7 @@ def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]], cont
 
     elapsed = time.time() - start_time
     meta_data = f'time: {elapsed:.2f}s'
-    api.update_progress(100, f'patch apply completed {meta_data}')
+    api.update_progress(100, f'apply completed {meta_data}')
 
 
 def extension(api: ExtensionAPI):
