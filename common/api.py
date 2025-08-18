@@ -1,6 +1,6 @@
-import json
+import requests
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
 TAGS = {
     'think': 'collapse',
@@ -58,7 +58,7 @@ class ExtensionAPI:
             api_key: str
             api_provider: str
     """
-
+    _meta_data: Any
     repo_files: List[File]
     repo_path: str
     current_file: Optional[File]
@@ -78,6 +78,7 @@ class ExtensionAPI:
     _blocks: List[str]
 
     def load(self, **kwargs):
+        self._meta_data = kwargs['meta_data']
         self.selection = kwargs.get('selection', None)
         self.cursor_row = kwargs.get('cursor_row', None)
         self.cursor_column = kwargs.get('cursor_column', None)
@@ -112,8 +113,10 @@ class ExtensionAPI:
     def _dump(self, method: str, **kwargs):
         assert 'method' not in kwargs
         kwargs['method'] = method
+        kwargs['meta_data'] = self._meta_data
 
-        print(json.dumps(kwargs), flush=True)
+        port = self._meta_data['port']
+        requests.post(f'http://localhost:{port}/api/extension', json=kwargs)
 
     def push_to_chat(self, content: str):
         """Send content to be displayed in the chat UI."""
