@@ -1,5 +1,6 @@
 chat:
   - default
+  - files
 apply: apply
 symbol_lookup: lookup
 autocomplete: autocomplete
