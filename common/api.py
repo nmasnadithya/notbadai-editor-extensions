@@ -53,6 +53,7 @@ class ExtensionAPI:
             chat_history: List of previous chat messages
             terminal_snapshot: what user sees in the terminal screen
             terminal_before_reset: Terminal content from before last reset/clear
+            context_files: Dictionary mapping user-specified paths to their corresponding file lists
             prompt: Current user prompt
             symbol: Symbol name (for symbol lookup)
             api_key: str
@@ -70,6 +71,7 @@ class ExtensionAPI:
     chat_history: List[Message]
     terminal_snapshot: Optional[List[str]]
     terminal_before_reset: Optional[List[str]]
+    context_files: Dict[str, List[File]]
     prompt: Optional[str]
     symbol: Optional[str]
     api_key: Optional[str]
@@ -105,6 +107,12 @@ class ExtensionAPI:
         self.opened_files = [File(p, self.repo_path) for p in kwargs['opened_files']]
 
         self.edit_file = File(kwargs['edit_file'], self.repo_path) if 'edit_file' in kwargs else None
+
+        context_files = {}
+        for entry, values in kwargs.get('context_files', {}).items():
+            files = [File(p, self.repo_path) for p in values]
+            context_files[entry] = files
+        self.context_files = context_files
 
         self._blocks = []
 

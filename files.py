@@ -3,8 +3,8 @@ from typing import List
 from common.api import ExtensionAPI
 from common.llm import call_llm
 from common.utils import parse_prompt, get_prompt_template
+from common.terminal import get_terminal_snapshot
 from extensions.default import build_context
-from extensions.common.terminal import get_terminal_snapshot
 
 
 def get_yaml(response) -> List[str]:
@@ -101,19 +101,19 @@ def extension(api: ExtensionAPI):
 
     files = [f for f in files if f.exists()]
     context = build_context(api,
-                                      other_files=files,
-                                      selection=api.selection,
-                                      file_list=files,
-                                      current_file=api.current_file,
-                                      terminal=terminal_snapshot,
-                                      cursor=(api.cursor_row, api.cursor_column),
-                                      )
+                            other_files=files,
+                            selection=api.selection,
+                            file_list=files,
+                            current_file=api.current_file,
+                            terminal=terminal_snapshot,
+                            cursor=(api.cursor_row, api.cursor_column),
+                            )
 
     api.push_meta(f'With context: {len(context) :,},'
                   f' selection: {bool(api.selection)}')
     # api.log(context)
     messages = [
-        {'role': 'system', 'content': get_prompt_template('files.system', model=model)},
+        {'role': 'system', 'content': get_prompt_template('chat.system', model=model)},
         {'role': 'user', 'content': context},
         *[m.to_dict() for m in api.chat_history],
         {'role': 'user', 'content': prompt},

@@ -18,15 +18,24 @@ def build_context(api: 'ExtensionAPI', *,
     """Builds the context string from the current file and selection."""
     context = []
 
+    if api.context_files:
+        api.push_meta(f'Context paths: {", ".join(list(api.context_files.keys()))}')
+
     if file_list:
         repo_files = [f'{f.path}`' for f in file_list]
         context.append(markdown_section("List of Files", "\n".join(repo_files)))
 
     if other_files:
-        api.push_meta(f'Relevant files: {", ".join(f.path for f in other_files)}')
+        api.push_meta(f'Opened files: {", ".join(f.path for f in other_files)}')
 
-        other_files = [f'Path: `{f.path}`\n\n' + markdown_code_block(f.get_content()) for f in other_files]
-        context.append(markdown_section("Relevant files", "\n\n".join(other_files)))
+    # combine other_files with files from context_files, removing duplicates
+    all_files = (other_files or []) + [f for files_list in api.context_files.values() for f in files_list]
+    relevant_files = list({f.path: f for f in all_files}.values())
+
+    if relevant_files:
+        api.push_meta(f'Relevant files: {", ".join(f.path for f in relevant_files)}')
+        relevant_files = [f'Path: `{f.path}`\n\n' + markdown_code_block(f.get_content()) for f in relevant_files]
+        context.append(markdown_section("Relevant files", "\n\n".join(relevant_files)))
 
     if current_file:
         api.push_meta(f'Current file: {current_file.path}')
