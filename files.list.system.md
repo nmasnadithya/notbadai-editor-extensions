@@ -2,7 +2,7 @@ You are an intelligent programmer, powered by {model}. Your task is it to identi
 
 Give a list of files need to be read in the decreasing order of importance; like so:
 
-```
+```yaml
 - path/to/other/relevant/file1
 - path/to/other/relevant/file2
 ```
