@@ -1,9 +1,10 @@
 chat:
   - default
   - files
-apply: apply
+apply: apply.model
 symbol_lookup: lookup
 autocomplete: autocomplete
+voice: voice
 key_binds:
   autocomplete_big:
     shortcut: "ctrl+m"
@@ -22,6 +23,3 @@ diff:
   min_auto_collapse_lines: 5
   context_lines: 2
 port: 7520
-
-
-

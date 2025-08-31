@@ -76,6 +76,7 @@ class ExtensionAPI:
     symbol: Optional[str]
     api_key: Optional[str]
     api_provider: Optional[str]
+    audio_blob_path: Optional[str]
 
     _blocks: List[str]
 
@@ -89,6 +90,7 @@ class ExtensionAPI:
         self.terminal_before_reset = kwargs.get('terminal_before_reset', None)
         self.api_key = kwargs.get('api_key', None)
         self.api_provider = kwargs.get('api_provider', None)
+        self.audio_blob_path = kwargs.get('audio_blob_path', None)
 
         if 'chat_history' in kwargs:
             self.chat_history = [Message(**m) for m in kwargs['chat_history']]
@@ -252,3 +254,6 @@ class ExtensionAPI:
             title: Optional title for the notification
         """
         self._dump('notify', content=content, title=title)
+
+    def send_audio_transcription(self, content: str):
+        self._dump('send_audio_transcription', content=content)
