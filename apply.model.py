@@ -38,7 +38,7 @@ def call_llm(api: ExtensionAPI, model: str, messages: List[Dict[str, str]], cont
 def extension(api: ExtensionAPI):
     prompt = api.prompt.rstrip()  # no left strip for indentation
 
-    if api.edit_file.path == api.current_file.path:
+    if api.current_file and api.edit_file.path == api.current_file.path:
         content = api.current_file.get_content()
     else:
         try:
