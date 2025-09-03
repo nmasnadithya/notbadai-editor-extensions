@@ -11,7 +11,10 @@ if typing.TYPE_CHECKING:
     from .api import ExtensionAPI
 
 
-def call_llm(api: 'ExtensionAPI', model_id: str, messages: List[Dict[str, str]], *,
+def call_llm(api: 'ExtensionAPI',
+             model_id: str,
+             messages: List[Dict[str, str]],
+             *,
              push_to_chat: bool = True,
              temperature: float = 1.0,
              top_p: float = 1.0,
@@ -31,7 +34,6 @@ def call_llm(api: 'ExtensionAPI', model_id: str, messages: List[Dict[str, str]],
     start_time = time.time()
 
     client = OpenAI(api_key=api.api_key, base_url=provider['base_url'])
-    # client = OpenAI(api_key=api.api_key, base_url="https://api.deepinfra.com/v1/openai")
 
     stream = client.chat.completions.create(
         model=model_name,

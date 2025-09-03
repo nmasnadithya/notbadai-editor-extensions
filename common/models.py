@@ -16,4 +16,10 @@ MODELS = {
         'deepinfra': 'Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo',
         'openrouter': 'qwen/qwen3-coder'
     },
+    'morph_fast': {
+        'openrouter': 'morph/morph-v3-fast'
+    },
+    'morph_large': {
+        'openrouter': 'morph/morph-v3-large'
+    }
 }
