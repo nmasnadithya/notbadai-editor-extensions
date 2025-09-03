@@ -11,10 +11,7 @@ def extension(api: ExtensionAPI):
     if api.current_file and api.edit_file.path == api.current_file.path:
         content = api.current_file.get_content()
     else:
-        try:
-            content = api.edit_file.get_content()
-        except FileNotFoundError:
-            content = ''
+        content = api.edit_file.get_content()
 
     instruction = ''
 
