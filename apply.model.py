@@ -3,6 +3,8 @@ from common.diff import get_matches
 from common.llm import call_llm
 
 
+# https://docs.morphllm.com/api-reference/endpoint/apply
+
 def extension(api: ExtensionAPI):
     prompt = api.prompt.rstrip()  # no left strip for indentation
 
