@@ -8,6 +8,30 @@ TAGS = {
 }
 
 
+class ToolComponent:
+    """Base class for tool UI components."""
+
+    def __init__(self, component_type: str, **kwargs):
+        self.type = component_type
+        self.kwargs = kwargs
+
+    def to_data(self):
+        """Convert component to dictionary format for serialization."""
+        data = {'type': self.type}
+        data.update(self.kwargs)
+        return data
+
+
+class Button(ToolComponent):
+    def __init__(self, name: str, disabled: bool = False):
+        super().__init__('button', name=name, disabled=disabled)
+
+
+class Input(ToolComponent):
+    def __init__(self, name: str, placeholder: str = None, value: str = None, disabled: bool = False):
+        super().__init__('input', name=name, placeholder=placeholder, value=value, disabled=disabled)
+
+
 class File:
     def __init__(self, path: str, repo_path: str, content: str = None):
         self.path: str = path
@@ -77,6 +101,8 @@ class ExtensionAPI:
     api_key: Optional[str]
     api_provider: Optional[str]
     audio_blob_path: Optional[str]
+    tool_action: Optional[str]
+    tool_state: Optional[Dict[str, Any]]
 
     _blocks: List[str]
 
@@ -91,6 +117,8 @@ class ExtensionAPI:
         self.api_key = kwargs.get('api_key', None)
         self.api_provider = kwargs.get('api_provider', None)
         self.audio_blob_path = kwargs.get('audio_blob_path', None)
+        self.tool_action = kwargs.get('tool_action', None)
+        self.tool_state = kwargs.get('tool_state', None)
 
         if 'chat_history' in kwargs:
             self.chat_history = [Message(**m) for m in kwargs['chat_history']]
@@ -256,4 +284,24 @@ class ExtensionAPI:
         self._dump('notify', content=content, title=title)
 
     def send_audio_transcription(self, content: str):
+        """Send audio transcription result to the client UI.
+
+        Args:
+            content: The transcribed text from audio input
+        """
         self._dump('send_audio_transcription', content=content)
+
+    def send_tool_interface(self, title: str, tool_interface: List[List[ToolComponent]]):
+        """Send a tool interface to be rendered in the UI.
+
+        Args:
+            tool_interface: List of rows, where each row is a list of ToolComponent objects
+            :param title:
+        """
+
+        serialized_rows = []
+        for row in tool_interface:
+            serialized_row = [component.to_data() for component in row]
+            serialized_rows.append(serialized_row)
+
+        self._dump('send_tool_interface', tool_interface={'title': title, 'rows': serialized_rows})

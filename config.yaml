@@ -23,3 +23,6 @@ diff:
   min_auto_collapse_lines: 5
   context_lines: 2
 port: 7520
+tools:
+   - name: "git commit"
+     description: "A git commit tool"
