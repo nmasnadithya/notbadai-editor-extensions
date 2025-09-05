@@ -8,6 +8,16 @@ TAGS = {
 }
 
 
+class ToolState:
+    """Represents the state of a UI component in a tool interface."""
+
+    def __init__(self, tool_type: str, name: str, value: str = None, disabled: bool = False):
+        self.type = tool_type
+        self.name = name
+        self.value = value or ""
+        self.disabled = disabled
+
+
 class ToolComponent:
     """Base class for tool UI components."""
 
@@ -102,7 +112,7 @@ class ExtensionAPI:
     api_provider: Optional[str]
     audio_blob_path: Optional[str]
     tool_action: Optional[str]
-    tool_state: Optional[Dict[str, Any]]
+    tool_state: Optional[Dict[str, ToolState]]
 
     _blocks: List[str]
 
@@ -118,7 +128,12 @@ class ExtensionAPI:
         self.api_provider = kwargs.get('api_provider', None)
         self.audio_blob_path = kwargs.get('audio_blob_path', None)
         self.tool_action = kwargs.get('tool_action', None)
-        self.tool_state = kwargs.get('tool_state', None)
+
+        self.tool_state = {}
+        if kwargs.get('tool_state', None) :
+            self.tool_state = kwargs['tool_state']
+            for k, v in kwargs['tool_state'].items():
+                self.tool_state[k] = ToolState(**v)
 
         if 'chat_history' in kwargs:
             self.chat_history = [Message(**m) for m in kwargs['chat_history']]

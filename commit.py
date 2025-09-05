@@ -79,7 +79,7 @@ def extension(api: ExtensionAPI):
         api.send_tool_interface('Git Commit and Push', tool_interface)
 
     elif api.tool_action == 'Commit and Push':
-        commit_message = api.tool_state['commit_message']['value'].strip()
+        commit_message = api.tool_state['commit_message'].value.strip()
 
         api.update_progress(50, "Committing and pushing changes...")
         client.commit_push(commit_message)
