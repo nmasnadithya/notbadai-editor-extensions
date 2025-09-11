@@ -18,7 +18,7 @@ def extension(api: ExtensionAPI):
     messages = [
         {
             "role": "user",
-            "content": f"<instructions>{instruction}</instructions>\n<code>f{content}</code>\n<update>{prompt}</update>"
+            "content": f"<instructions>{instruction}</instructions>\n<code>{content}</code>\n<update>{prompt}</update>"
         }
     ]
 
