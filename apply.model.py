@@ -4,9 +4,8 @@ from common.llm import call_llm
 
 
 # https://docs.morphllm.com/api-reference/endpoint/apply
-
 def extension(api: ExtensionAPI):
-    prompt = api.prompt.rstrip()  # no left strip for indentation
+    prompt = api.prompt.rstrip()
 
     if api.current_file and api.edit_file.path == api.current_file.path:
         content = api.current_file.get_content()
@@ -14,7 +13,6 @@ def extension(api: ExtensionAPI):
         content = api.edit_file.get_content()
 
     instruction = ''
-
     messages = [
         {
             "role": "user",
@@ -27,5 +25,6 @@ def extension(api: ExtensionAPI):
                            messages,
                            push_to_chat=False,
                            )
+    
     matches, cleaned_patch = get_matches(content, merged_code)
     api.apply_diff(cleaned_patch, matches)

@@ -5,24 +5,32 @@ apply: apply.model
 symbol_lookup: lookup
 autocomplete: autocomplete
 voice: voice
-key_binds:
-  autocomplete_big:
-    shortcut: "ctrl+m"
-    extension: "autocomplete_big"
-  modify:
-    shortcut: "ctrl+,"
-    extension: "modify_big"
-  analyze:
-    shortcut: "cmd+e"
-    extension: "analyze"
-  format:
-    shortcut: "cmd+l"
-    extension: "format"
 diff:
   min_collapse_lines: 3
   min_auto_collapse_lines: 5
   context_lines: 2
+  # ignore_whitespace: true
 port: 7520
 tools:
-   - name: "git commit"
-     description: "A git commit tool"
+   - name: "source control"
+     extension: "commit"
+     description: "A git commit tool" 
+     pinned: true
+   - name: "modify big"
+     extension: "modify_big"
+     shortcut: "ctrl+,"
+   - name: "autocomplete big"
+     extension: "autocomplete_big"
+     shortcut: "ctrl+m"
+     pinned: true
+   - name: "analyze"
+     extension: "analyze"
+     shortcut: "cmd+e"
+   - name: "format"
+     extension: "format"
+     shortcut: "cmd+l"
+     pinned: true
+
+
+
+
