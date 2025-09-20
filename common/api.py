@@ -84,14 +84,20 @@ class ExtensionAPI:
             selection: Currently selected text (if any)
             cursor_row: Current cursor row position
             cursor_column: Current cursor column position
+            clip_board: Clipboard content
             chat_history: List of previous chat messages
             terminal_snapshot: what user sees in the terminal screen
             terminal_before_reset: Terminal content from before last reset/clear
+            active_terminal_name: Name of the currently active terminal
+            terminal_names: List of all available terminal names
             context_files: Dictionary mapping user-specified paths to their corresponding file lists
             prompt: Current user prompt
             symbol: Symbol name (for symbol lookup)
-            api_key: str
-            api_provider: str
+            api_key: API key for external services
+            api_provider: API provider name
+            audio_blob_path: Path to audio blob file for voice input
+            tool_action: Current tool action being performed
+            tool_state: Dictionary of tool component states
     """
     _meta_data: Any
     repo_files: List[File]
