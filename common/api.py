@@ -105,6 +105,8 @@ class ExtensionAPI:
     chat_history: List[Message]
     terminal_snapshot: Optional[List[str]]
     terminal_before_reset: Optional[List[str]]
+    active_terminal_name: Optional[str]
+    terminal_names: Optional[List[str]]
     context_files: Dict[str, List[File]]
     prompt: Optional[str]
     symbol: Optional[str]
@@ -128,9 +130,11 @@ class ExtensionAPI:
         self.api_provider = kwargs.get('api_provider', None)
         self.audio_blob_path = kwargs.get('audio_blob_path', None)
         self.tool_action = kwargs.get('tool_action', None)
+        self.active_terminal_name = kwargs.get('active_terminal_name', None)
+        self.terminal_names = kwargs.get('terminal_names', None)
 
         self.tool_state = {}
-        if kwargs.get('tool_state', None) :
+        if kwargs.get('tool_state', None):
             self.tool_state = kwargs['tool_state']
             for k, v in kwargs['tool_state'].items():
                 self.tool_state[k] = ToolState(**v)
@@ -170,6 +174,22 @@ class ExtensionAPI:
 
         port = self._meta_data['port']
         requests.post(f'http://localhost:{port}/api/extension', json=kwargs)
+
+    def get_terminal_data(self, terminal_name: str) -> Dict[str, List[str]]:
+        """Get terminal data (snapshot and lines before reset) for a specific terminal.
+
+        Args:
+            terminal_name: Name of the terminal to get data from
+
+        Returns:
+            Dictionary with 'snapshot' and 'linesBeforeReset' keys containing lists of strings
+        """
+        port = self._meta_data['port']
+        response = requests.get(f'http://localhost:{port}/api/terminal/{terminal_name}')
+        response.raise_for_status()
+
+        result = response.json()
+        return result['data']
 
     def push_to_chat(self, content: str):
         """Send content to be displayed in the chat UI."""
