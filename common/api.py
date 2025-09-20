@@ -188,7 +188,7 @@ class ExtensionAPI:
             terminal_name: Name of the terminal to get data from
 
         Returns:
-            Dictionary with 'snapshot' and 'linesBeforeReset' keys containing lists of strings
+            Dictionary with 'snapshot' and 'lines_before_reset' keys containing lists of strings
         """
         port = self._meta_data['port']
         response = requests.get(f'http://localhost:{port}/api/terminal/{terminal_name}')
