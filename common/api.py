@@ -84,7 +84,6 @@ class ExtensionAPI:
             selection: Currently selected text (if any)
             cursor_row: Current cursor row position
             cursor_column: Current cursor column position
-            clip_board: Clipboard content
             chat_history: List of previous chat messages
             terminal_snapshot: what user sees in the terminal screen
             terminal_before_reset: Terminal content from before last reset/clear
@@ -188,7 +187,7 @@ class ExtensionAPI:
             terminal_name: Name of the terminal to get data from
 
         Returns:
-            Dictionary with 'snapshot' and 'lines_before_reset' keys containing lists of strings
+            Dictionary with 'snapshot' and 'before_reset' keys containing lists of strings
         """
         port = self._meta_data['port']
         response = requests.get(f'http://localhost:{port}/api/terminal/{terminal_name}')
