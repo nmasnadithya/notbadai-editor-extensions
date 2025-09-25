@@ -24,16 +24,27 @@ def call_llm(api: 'ExtensionAPI',
     """Streams responses from the LLM and sends them to the chat UI in real-time."""
 
     model_info = MODELS[model_id]
-    model_name = model_info[api.api_provider]
+
+    api_key, model_name = None, None
+    if api.api_keys.default.provider in model_info:
+        model_name = model_info[api.api_keys.default.provider]
+        api_key = api.api_keys.default
+    else:
+        for api_key in api.api_keys.keys:
+            if api_key.provider in model_info:
+                model_name = model_info[api_key.provider]
+                api_key = api_key
+                break
+
     provider = None
     for p in LLM_PROVIDERS:
-        if p['name'] == api.api_provider:
+        if p['name'] == api_key.provider:
             provider = p
             break
 
     start_time = time.time()
 
-    client = OpenAI(api_key=api.api_key, base_url=provider['base_url'])
+    client = OpenAI(api_key=api_key.key, base_url=provider['base_url'])
 
     stream = client.chat.completions.create(
         model=model_name,

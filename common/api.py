@@ -42,6 +42,31 @@ class Input(ToolComponent):
         super().__init__('input', name=name, placeholder=placeholder, value=value, disabled=disabled)
 
 
+class APIKey:
+    def __init__(self, key: str, provider: str, is_default: bool = False):
+        self.key = key
+        self.provider = provider
+        self.is_default = is_default
+
+
+class APIKeys:
+    def __init__(self, api_keys: List[APIKey]):
+        self.keys = api_keys
+        self._default = None
+
+    @property
+    def default(self) -> APIKey:
+        if self._default is not None:
+            return self._default
+
+        for api_key in self.keys:
+            if api_key.is_default:
+                self._default = api_key
+                break
+
+        return self._default
+
+
 class File:
     def __init__(self, path: str, repo_path: str, content: str = None):
         self.path: str = path
@@ -92,8 +117,7 @@ class ExtensionAPI:
             context_files: Dictionary mapping user-specified paths to their corresponding file lists
             prompt: Current user prompt
             symbol: Symbol name (for symbol lookup)
-            api_key: API key for external services
-            api_provider: API provider name
+            api_keys: API keys for external services
             audio_blob_path: Path to audio blob file for voice input
             tool_action: Current tool action being performed
             tool_state: Dictionary of tool component states
@@ -115,8 +139,7 @@ class ExtensionAPI:
     context_files: Dict[str, List[File]]
     prompt: Optional[str]
     symbol: Optional[str]
-    api_key: Optional[str]
-    api_provider: Optional[str]
+    api_keys: APIKeys
     audio_blob_path: Optional[str]
     tool_action: Optional[str]
     tool_state: Optional[Dict[str, ToolState]]
@@ -131,8 +154,6 @@ class ExtensionAPI:
         self.prompt = kwargs.get('prompt', None)
         self.terminal_snapshot = kwargs.get('terminal_snapshot', None)
         self.terminal_before_reset = kwargs.get('terminal_before_reset', None)
-        self.api_key = kwargs.get('api_key', None)
-        self.api_provider = kwargs.get('api_provider', None)
         self.audio_blob_path = kwargs.get('audio_blob_path', None)
         self.tool_action = kwargs.get('tool_action', None)
         self.active_terminal_name = kwargs.get('active_terminal_name', None)
@@ -167,6 +188,11 @@ class ExtensionAPI:
             files = [File(p, self.repo_path) for p in values]
             context_files[entry] = files
         self.context_files = context_files
+
+        api_keys = []
+        for api_key in kwargs.get('api_keys', []):
+            api_keys.append(APIKey(key=api_key['key'], provider=api_key['provider'], is_default=api_key['is_default']))
+        self.api_keys = APIKeys(api_keys=api_keys)
 
         self._blocks = []
 
