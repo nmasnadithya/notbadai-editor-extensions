@@ -25,6 +25,9 @@ def call_llm(api: 'ExtensionAPI',
 
     model_info = MODELS[model_id]
 
+    if len(api.api_keys.keys) == 0:
+        raise ValueError('API key required. Configure at least one in Extensions → Management.')
+
     api_key, model_name = None, None
     if api.api_keys.default.provider in model_info:
         model_name = model_info[api.api_keys.default.provider]
