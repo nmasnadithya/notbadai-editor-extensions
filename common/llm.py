@@ -33,11 +33,14 @@ def call_llm(api: 'ExtensionAPI',
         model_name = model_info[api.api_keys.default.provider]
         api_key = api.api_keys.default
     else:
-        for api_key in api.api_keys.keys:
-            if api_key.provider in model_info:
-                model_name = model_info[api_key.provider]
-                api_key = api_key
+        for k in api.api_keys.keys:
+            if k.provider in model_info:
+                model_name = model_info[k.provider]
+                api_key = k
                 break
+
+    if api_key is None:
+        raise ValueError(f"The API provider does not support {model_id} model")
 
     provider = None
     for p in LLM_PROVIDERS:
