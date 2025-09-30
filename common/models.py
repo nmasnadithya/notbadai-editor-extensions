@@ -10,7 +10,7 @@ MODELS = {
     },
     'default': {
         'deepinfra': 'Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo',
-        'openrouter': 'anthropic/claude-sonnet-4'
+        'openrouter': 'anthropic/claude-sonnet-4.5'
     },
     'qwen': {
         'deepinfra': 'Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo',
