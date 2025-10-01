@@ -7,10 +7,9 @@ from openai import OpenAI
 from common.api import ExtensionAPI, File
 from common.models import MODELS
 from common.settings import LLM_PROVIDERS
-from extensions.chat import build_context
-from extensions.common.formatting import markdown_section, markdown_code_block, add_line_comment
-from extensions.common.terminal import get_terminal_snapshot
-from extensions.common.utils import parse_prompt, get_prompt_template
+from common.formatting import markdown_section, markdown_code_block, add_line_comment
+from common.terminal import get_terminal_snapshot
+from common.utils import parse_prompt, get_prompt_template
 
 
 def search_repo_files(api: ExtensionAPI, query: str, file_extensions: List[str] = None) -> List[Dict]:
@@ -126,18 +125,11 @@ TOOLS = [
     },
 ]
 
-MESSAGES = [
-    {
-        "role": "user",
-        "content": "What's the temperature in San Francisco now? How about tomorrow? Current Date: 2024-09-30.",
-    },
-]
-
 tools = TOOLS
 
 
 def call_llm(
-        api: "ExtensionAPI",
+        api: 'ExtensionAPI',
         model_id: str,
         messages,
         *,
@@ -150,17 +142,33 @@ def call_llm(
     """Streams responses from the LLM and sends them to the chat UI in real-time."""
 
     model_info = MODELS[model_id]
+
+    if len(api.api_keys.keys) == 0:
+        raise ValueError('API key required. Configure at least one in Extensions → Management.')
+
+    api_key, model_name = None, None
+    if api.api_keys.default.provider in model_info:
+        model_name = model_info[api.api_keys.default.provider]
+        api_key = api.api_keys.default
+    else:
+        for k in api.api_keys.keys:
+            if k.provider in model_info:
+                model_name = model_info[k.provider]
+                api_key = k
+                break
+
+    if api_key is None:
+        raise ValueError(f"The API provider does not support {model_id} model")
+
     provider = None
-    model_name = None
     for p in LLM_PROVIDERS:
-        if p["name"] in model_info:
-            model_name = model_info[p["name"]]
+        if p['name'] == api_key.provider:
             provider = p
             break
 
     start_time = time.time()
 
-    client = OpenAI(api_key=provider["api_key"], base_url=provider["base_url"])
+    client = OpenAI(api_key=api_key.key, base_url=provider["base_url"])
     # client = OpenAI(api_key=api.api_key, base_url="https://api.deepinfra.com/v1/openai")
 
     stream = client.chat.completions.create(
@@ -178,9 +186,13 @@ def call_llm(
     usage = None
     content = ""
     response = []
+    # Buffer for a tool/function call (partial) if one is in progress
+    in_tool_call = False
+    tool_call_buf = []
 
     for chunk in stream:
-        delta = chunk.choices[0].delta
+        choice = chunk.choices[0]
+        delta = choice.delta
         if push_to_chat:
             if getattr(delta, "reasoning", None):
                 if not thinking:
@@ -188,35 +200,78 @@ def call_llm(
                     thinking = True
                 api.push_to_chat(content=delta.reasoning)
 
-        if delta.content:
-            if push_to_chat:
-                if thinking:
-                    api.end_block()
-                    thinking = False
-                api.push_to_chat(content=delta.content)
-            content += delta.content
+        # If there is content
+        if hasattr(delta, "content") and delta.content:
+            # If currently inside a tool_call, we probably shouldn't push normal content yet
+            if in_tool_call:
+                # The model is (per spec) not supposed to give normal content during a function_call streaming
+                # But if it does, you can buffer or handle gracefully. Here, we'll treat as error / flush.
+                content += delta.content
+            else:
+                # Normal assistant content
+                if push_to_chat:
+                    if thinking:
+                        api.end_block()
+                        thinking = False
+                    api.push_to_chat(content=delta.content)
+                content += delta.content
 
         if delta.tool_calls:
-            api.log(chunk.choices[0].delta.json())
+            # Mark that we are in function call mode
+            in_tool_call = True
+
+            for tool_call in delta.tool_calls:
+                tool_index = tool_call.index
+                while len(tool_call_buf) < tool_index + 1:
+                    tool_call_buf.append({
+                        "id": tool_call.id,
+                        "name": "",
+                        "arguments": ""
+                    })
+                # Append parts
+                if tool_call.function.name:
+                    tool_call_buf[tool_index]["name"] += tool_call.function.name
+                if tool_call.function.arguments:
+                    tool_call_buf[tool_index]["arguments"] += tool_call.function.arguments
+
+        # Check if this chunk ends a tool/function call
+        finish_reason = getattr(choice, "finish_reason", None)
+        if in_tool_call and finish_reason == "tool_calls":
+            # We got the full tool call name + arguments
+            # First, flush any pending assistant content
             if content.strip():
                 response.append({
                     "role": "assistant",
                     "content": content,
                 })
             content = ''
-            tool_calls = [json.loads(t.json()) for t in delta.tool_calls]
+            tool_calls = [ {
+                "id": tool_call["id"],
+                "function": {
+                    "name": tool_call["name"],
+                    "arguments": tool_call["arguments"]
+                },
+                # optionally: id or other metadata if available
+            } for tool_call in tool_call_buf if tool_call["name"] or tool_call["arguments"]]
 
-
-            for t in tool_calls:
-                args = json.loads(t['function']['arguments'])
-                args = ', '.join(f'{k}={repr(v)}' for k, v in args.items())
-                api.push_meta('<strong>' + t['function']['name'] + '</strong>(' +
-                              args + ')')
+            # Push metadata / logging / meta UI
+            for tool_call in tool_calls:
+                try:
+                    args_dict = json.loads(tool_call["function"]["arguments"] or "{}")
+                except json.JSONDecodeError:
+                    args_dict = {}
+                api.log(f"Tool call: {tool_call["function"]['name']} args {args_dict}")
+                api.push_meta(f'<strong>{tool_call["function"]["name"]}</strong>(' +
+                              ', '.join(f'{k}={repr(v)}' for k, v in args_dict.items()) + ')')
 
             response.append({
                 'role': 'assistant',
                 'tool_calls':tool_calls,
             })
+
+            # Reset buffers
+            in_tool_call = False
+            tool_call_buf = []
 
         if chunk.usage is not None:
             assert usage is None
@@ -266,7 +321,7 @@ def build_context(api: 'ExtensionAPI', *,
         api.push_meta(f'Current file: {current_file.path}')
         context.append(
             markdown_section("Current File",
-                             f"Path: ⁠ {current_file.path} ⁠\n\n" +
+                             f"Path: `{current_file.path}`\n\n" +
                              markdown_code_block(current_file.get_content()))
         )
 
@@ -301,7 +356,7 @@ def build_context(api: 'ExtensionAPI', *,
         assert len(block) > cursor[0], f'Cursor row {cursor[0]} block of length {len(block)}'
         prefix = block[cursor[0] - 3: cursor[0]]
         line = block[cursor[0]]
-        line = add_line_comment(current_file, line, f'Cursor is here: ⁠ {line[:cursor[1]].strip()} ⁠')
+        line = add_line_comment(current_file, line, f'Cursor is here: `{line[:cursor[1]].strip()}`')
         suffix = block[cursor[0] + 1:cursor[0] + 4]
 
         block = prefix + [line] + suffix
