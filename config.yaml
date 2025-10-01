@@ -2,6 +2,7 @@ chat:
   - default
   - files
   - files_planning
+  - tools
 apply: apply.model
 symbol_lookup: lookup
 autocomplete: autocomplete
@@ -15,7 +16,7 @@ port: 7520
 tools:
    - name: "source control"
      extension: "commit"
-     description: "A git commit tool" 
+     description: "A git commit tool"
      pinned: true
    - name: "modify big"
      extension: "modify_big"
