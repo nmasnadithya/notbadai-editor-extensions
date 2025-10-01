@@ -1,6 +1,7 @@
 chat:
   - default
   - files
+  - files_planning
 apply: apply.model
 symbol_lookup: lookup
 autocomplete: autocomplete
